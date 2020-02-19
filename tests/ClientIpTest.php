@@ -171,6 +171,15 @@ class ClientIpTest extends TestCase
         ], $request);
 
         $this->assertEquals('1.1.1.1', (string) $response->getBody());
+
+        $response = Dispatcher::run([
+            (new ClientIp())->proxy(['1.0.0.0/8']),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertEquals('2.2.2.2', (string) $response->getBody());
     }
 
     public function testNoRemoteAddr()

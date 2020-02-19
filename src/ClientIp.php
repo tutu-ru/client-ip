@@ -110,7 +110,8 @@ class ClientIp implements MiddlewareInterface
 
         $cidr_base = ip2long($tokens[0]);
         $ip_long = ip2long($ip);
-        $mask = (0xffffffff << intval($tokens[1])) & 0xffffffff;
+
+        $mask = -1 << (32 - intval($tokens[1]));
 
         return ($cidr_base & $mask) === ($ip_long & $mask);
     }
