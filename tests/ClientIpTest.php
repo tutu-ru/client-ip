@@ -63,13 +63,28 @@ class ClientIpTest extends TestCase
             ->withHeader('X-Forwarded', '11.11.11.11');
 
         $response = Dispatcher::run([
-            new ClientIp(),
-            function ($request) {
-                echo $request->getAttribute('client-ip');
-            },
-        ], $request);
+                                        new ClientIp(),
+                                        function ($request) {
+                                            echo $request->getAttribute('client-ip');
+                                        },
+                                    ], $request);
 
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
+    }
+
+    public function testEmptyRemoteAddrWithProxy()
+    {
+        $request = Factory::createServerRequest('GET', '/')
+            ->withHeader('X-Forwarded-For', '11.11.11.11');
+
+        $response = Dispatcher::run([
+                                        (new ClientIp())->proxy(['2.2.2.2']),
+                                        function ($request) {
+                                            echo $request->getAttribute('client-ip');
+                                        },
+                                    ], $request);
+
+        $this->assertEquals('11.11.11.11', (string) $response->getBody());
     }
 
     public function testClientIpV6NotProxy()
